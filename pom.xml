@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <!--<module>basic-operations</module>-->
+        <module>basic-operations</module>
         <!--<module>shape-recognition</module>-->
     </modules>
 

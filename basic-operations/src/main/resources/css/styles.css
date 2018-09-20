@@ -1,0 +1,163 @@
+.root {
+    -fx-font-smoothing-type: gray;
+    -main-color: #0277bd;
+    /*-accent-color: #7c4dff;*/
+    -accent-color: #0277bd;
+
+    -error-color: #f44236;
+    -text-color: #1F1F1F;
+    -text-light-color: #666666;
+    -text-white-color: #F8F8F9;
+}
+
+.label {
+    -fx-font-family: Roboto;
+}
+
+.image-pane {
+    -fx-background-color: #E9E9E9;
+}
+.settings-pane {
+    -fx-background-color: white;
+    -fx-border-color: linear-gradient(to left, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 20%, rgba(233, 233, 233, 0) 100%);
+    -fx-border-width: 0px 0 0px 7px;
+    -fx-border-insets: 0px 0 0px -7px;
+}
+.settings-pane .label.header {
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 18px;
+}
+
+.jfx-tool-bar {
+    -fx-font-size: 20px;
+    -fx-background-color: #263238;
+    -fx-pref-width: 100%;
+    -fx-pref-height: 48px;
+}
+.jfx-tool-bar .label {
+    -fx-font-family: "Roboto";
+}
+.jfx-tool-bar .icon {
+    -fx-fill: -text-white-color;
+}
+.jfx-tool-bar .label {
+    -fx-text-fill: -text-white-color;
+}
+.jfx-tool-bar HBox {
+    -fx-alignment: center;
+    -fx-spacing: 14;
+    -fx-padding: 0 16;
+}
+
+.file-drop-zone-box {
+    -fx-spacing: 16px;
+    -fx-text-fill: -text-white-color;
+}
+.file-drop-zone-box .error.label {
+    -fx-font-family: "Roboto Medium";
+    -fx-pref-height: 32px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-white-color;
+    -fx-padding: 8px 16px;
+    -fx-text-alignment: center;
+    -fx-background-color: -error-color;
+    -fx-background-radius: 30px;
+}
+.file-drop-zone {
+    -fx-border-color: #404040;
+    -fx-border-radius: 4;
+    -fx-border-style: dashed;
+    -fx-border-width: 2px;
+    -fx-pref-height: 320px;
+    -fx-alignment: center;
+    -fx-spacing: 20px;
+}
+.file-drop-zone .label {
+    -fx-alignment: center;
+    -fx-font-size: 18px;
+}
+.file-loading-box { -fx-spacing: 16px; }
+.file-loading-box .label { -fx-font-size: 16px; }
+
+.jfx-spinner:indeterminate .arc {
+    -fx-stroke: -accent-color;
+    -fx-stroke-width: 4.0;
+}
+
+.footer { -fx-padding: 16px; }
+
+.jfx-slider {
+    -jfx-default-thumb: -accent-color;
+}
+
+.jfx-slider:min .thumb,
+.jfx-slider:min:focused .thumb,
+.jfx-slider:min .animated-thumb{
+    -fx-background-color: -accent-color;
+}
+
+.jfx-text-field {
+    -jfx-focus-color: -main-color;
+    -jfx-unfocus-color: -text-light-color;
+    -fx-text-fill: -text-color;
+    -fx-prompt-text-fill: -text-light-color;
+    -fx-font-family: Roboto;
+    -fx-font-size: 13px;
+}
+
+.jfx-check-box {
+    -jfx-checked-color: -accent-color;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-color;
+}
+
+.jfx-text-field:error {
+    -jfx-focus-color: -error-color;
+    -jfx-unfocus-color: -error-color;
+}
+
+.jfx-text-field .error-label {
+    -fx-text-fill: -error-color;
+    -fx-font-size: 11px;
+}
+
+.jfx-button {
+    -fx-padding: 8px 16px;
+    -fx-font-size: 14px;
+    -fx-background-color: rgba(0,0,0,.12);
+    -jfx-button-type: FLAT;
+}
+
+.jfx-button.primary {
+    -fx-background-color: -main-color;
+    -fx-text-fill: -text-white-color;
+}
+.jfx-button.icon {
+    -fx-padding: 8px 16px 8px 8px;
+}
+
+.jfx-button.basic {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-color;
+}
+
+.alert-dialog-error .jfx-layout-heading .label {
+    -fx-text-fill: -error-color;
+}
+.alert-dialog-error .jfx-layout-heading MaterialDesignIconView {
+    -fx-fill: -error-color;
+}
+.alert-dialog-error .jfx-layout-actions .jfx-button {
+     -fx-text-fill: -error-color;
+ }
+
+.alert-dialog .jfx-layout-heading .label {
+    -fx-text-fill: -text-color;
+    -fx-font-family: "Roboto Medium";
+}
+
+.alert-dialog .jfx-layout-actions .jfx-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-color;
+    -jfx-disable-visual-focus: true;
+}
