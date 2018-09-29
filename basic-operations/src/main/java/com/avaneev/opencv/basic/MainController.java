@@ -94,6 +94,72 @@ public class MainController {
         event.consume();
     }
 
+    @FXML
+    private void onGrayScaleAction() {
+        imageProcessor.toGrayScale();
+        this.updateImageView();
+    }
+
+    @FXML
+    private void onVerticalFlipAction() {
+        imageProcessor.flipVertical();
+        this.updateImageView();
+    }
+
+    @FXML
+    private void onHorizontalFlipAction() {
+        imageProcessor.flipHorizontal();
+        this.updateImageView();
+    }
+
+    @FXML
+    private void applyRotation() {
+        imageProcessor.rotate((int) angleSlider.getValue());
+        angleSlider.setValue(0); // Will fire image reload in ImageView
+    }
+
+    @FXML
+    private void onSaveAction(ActionEvent event) {
+        fileChooser.setTitle("Save image");
+        fileChooser.setInitialFileName(filename);
+        fileChooser.getExtensionFilters().clear();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PNG Format", "*.png"),
+                new FileChooser.ExtensionFilter("JPEG Format", "*.jpeg", "*.jpg")
+        );
+        File file = fileChooser.showSaveDialog(((JFXButton) event.getSource()).getScene().getWindow());
+        if (file != null) {
+            JFXDialog alert = new JFXDialog();
+            CompletableFuture
+                    .runAsync(() -> imageProcessor.saveToFile(file))
+                    .thenRun(alert::close);
+            alert.setOverlayClose(false);
+            JFXDialogLayout layout = new JFXDialogLayout();
+            layout.getStyleClass().add("alert-dialog");
+            layout.setHeading(new Label("Save image"));
+            VBox vBox = new VBox(new JFXSpinner(), new Label("Saving " + file.getName() + "..."));
+            vBox.setAlignment(Pos.CENTER);
+            vBox.getStyleClass().add("file-loading-box");
+            vBox.setPadding(new Insets(32, 0, 16, 0));
+            layout.setBody(vBox);
+            alert.setContent(layout);
+            alert.show((StackPane) ((JFXButton) event.getTarget()).getScene().getRoot());
+        }
+    }
+
+    @FXML
+    private void reset() {
+        imageProcessor = null;
+        fileDropBox.setVisible(true);
+        errorLabel.setVisible(false);
+        imageView.setImage(null);
+        imageView.getParent().setVisible(false);
+        imageView.setFitHeight(0);
+        imageView.setFitWidth(0);
+        angleSlider.setValue(0);
+        settingsPane.setDisable(true);
+    }
+
     private void initScene() {
         angleField.setOnAction(event -> {
             this.setAngleInInput();
@@ -130,64 +196,11 @@ public class MainController {
         }
     }
 
-    @FXML
-    private void onGrayScaleAction() {
-        imageProcessor.toGrayScale();
-        this.updateImageView();
-    }
-
-    @FXML
-    private void onVerticalFlipAction() {
-        imageProcessor.flipVertical();
-        this.updateImageView();
-    }
-
-    @FXML
-    private void onHorizontalFlipAction() {
-        imageProcessor.flipHorizontal();
-        this.updateImageView();
-    }
-
-    @FXML
-    private void applyRotation() {
-        imageProcessor.rotate((int) angleSlider.getValue());
-        angleSlider.setValue(0); // Will fire image reload in ImageView
-    }
-
     private void updateImageView() {
         if (angleSlider.getValue() != 0) {
             angleSlider.setValue(0);
         } else {
             imageView.setImage(imageProcessor.toImage());
-        }
-    }
-
-    @FXML
-    public void onSaveAction(ActionEvent event) {
-        fileChooser.setTitle("Save image");
-        fileChooser.setInitialFileName(filename);
-        fileChooser.getExtensionFilters().clear();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PNG Format", "*.png"),
-                new FileChooser.ExtensionFilter("JPEG Format", "*.jpeg", "*.jpg")
-        );
-        File file = fileChooser.showSaveDialog(((JFXButton) event.getSource()).getScene().getWindow());
-        if (file != null) {
-            JFXDialog alert = new JFXDialog();
-            CompletableFuture
-                    .runAsync(() -> imageProcessor.saveToFile(file))
-                    .thenRun(alert::close);
-            alert.setOverlayClose(false);
-            JFXDialogLayout layout = new JFXDialogLayout();
-            layout.getStyleClass().add("alert-dialog");
-            layout.setHeading(new Label("Save image"));
-            VBox vBox = new VBox(new JFXSpinner(), new Label("Saving " + file.getName() + "..."));
-            vBox.setAlignment(Pos.CENTER);
-            vBox.getStyleClass().add("file-loading-box");
-            vBox.setPadding(new Insets(32, 0, 16, 0));
-            layout.setBody(vBox);
-            alert.setContent(layout);
-            alert.show((StackPane) ((JFXButton) event.getTarget()).getScene().getRoot());
         }
     }
 
@@ -204,17 +217,22 @@ public class MainController {
         fitImageViewHeight(stage.getHeight());
     }
 
+
     private void fitImageViewWidth(double stageWidth) {
         double w = stageWidth - 416; // Right sidebar width offset
-        if (imageView.getImage().getWidth() > w) {
+        if (imageView.getImage().getRequestedWidth() > w) {
             imageView.setFitWidth(w);
+        } else if (imageView.getFitWidth() != imageView.getImage().getRequestedWidth()) {
+            imageView.setFitWidth(imageView.getImage().getRequestedWidth());
         }
     }
 
     private void fitImageViewHeight(double stageHeight) {
         double h = stageHeight - 86; // Toolbar height offset
-        if (imageView.getImage().getHeight() > h) {
+        if (imageView.getImage().getRequestedHeight() > h) {
             imageView.setFitHeight(h);
+        } else if (imageView.getFitHeight() != imageView.getImage().getRequestedHeight()) {
+            imageView.setFitHeight(imageView.getImage().getRequestedHeight());
         }
     }
 
@@ -233,17 +251,5 @@ public class MainController {
         fileDropBox.setVisible(true);
         errorLabel.setText(text);
         errorLabel.getParent().setVisible(true);
-    }
-
-    @FXML
-    private void reset() {
-        imageProcessor = null;
-        fileDropBox.setVisible(true);
-        imageView.setImage(null);
-        imageView.getParent().setVisible(false);
-        imageView.setFitHeight(0);
-        imageView.setFitWidth(0);
-        angleSlider.setValue(0);
-        settingsPane.setDisable(true);
     }
 }

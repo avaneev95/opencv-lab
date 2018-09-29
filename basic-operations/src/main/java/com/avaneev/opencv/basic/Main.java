@@ -19,7 +19,6 @@ import java.net.URL;
 public class Main extends Application {
 
     static {
-//        nu.pattern.OpenCV.loadShared();
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         System.setProperty("prism.lcdtext", "false");
     }
