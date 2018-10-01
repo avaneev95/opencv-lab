@@ -1,5 +1,6 @@
 package com.avaneev.opencv.recognition;
 
+import com.avaneev.opencv.recognition.detection.ShapeDetector;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -17,12 +18,9 @@ import javafx.stage.Stage;
 import org.opencv.core.*;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -136,10 +134,8 @@ public class MainController {
     }
 
     private void initScene() {
-
-        imageView.setImage(SwingFXUtils.toFXImage((BufferedImage) HighGui.toBufferedImage(source), null));
+        this.repaintImage();
         this.resizeImage();
-
         Stage stage = ((Stage) imageView.getScene().getWindow());
         stage.widthProperty().addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
         stage.heightProperty().addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
@@ -148,35 +144,39 @@ public class MainController {
         imageView.getParent().setVisible(true);
         settingsPane.setDisable(false);
 
+
+        ShapeDetector detector = ShapeDetector.builder()
+                .source(source)
+                .drawContours(true)
+                .putLabels(true)
+                .onShapeDetected(shape -> {
+                    String s = shape.name().toLowerCase();
+                    s = s.substring(0, 1).toUpperCase() + s.substring(1);
+                    this.repaintImage();
+                    System.out.println("Detected shape: " + s);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .build();
+
+        CompletableFuture.runAsync(detector::detect);
+
         showEdgesToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
             Mat img = newValue ? edges : source;
-            Platform.runLater(() ->imageView.setImage(SwingFXUtils.toFXImage((BufferedImage) HighGui.toBufferedImage(img), null)));
+            Platform.runLater(() -> repaintImage(img));
         });
 
+    }
 
+    private void repaintImage() {
+        this.repaintImage(source);
+    }
 
-        edges = new Mat(source.size(), CvType.CV_8UC1);
-        Imgproc.cvtColor(source, edges, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.blur(edges, edges, new Size(3, 3));
-        Imgproc.Canny(edges, edges, 10, 100, 3);
-
-        ShapeDetector classifier = new ShapeDetector();
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        for (int i = 0; i < contours.size(); i++) {
-            if (Math.abs(Imgproc.contourArea(contours.get(i))) < 100) {
-                continue;
-            }
-
-            Shape shape = classifier.detect(contours.get(i));
-            if (shape != null) {
-                String shapeName = shape.name().toLowerCase();
-                Imgproc.drawContours(source, contours, i, new Scalar(0, 0, 255), 2);
-                Rect boundRect = Imgproc.boundingRect(new MatOfPoint(contours.get(i).toArray()));
-                Imgproc.putText(source, shapeName, new Point(boundRect.x, boundRect.y - 10), Core.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 0, 0), 1);
-            }
-        }
+    private void repaintImage(Mat img) {
+        imageView.setImage(SwingFXUtils.toFXImage((BufferedImage) HighGui.toBufferedImage(img), null));
     }
 
     private void loadImage(File file) {

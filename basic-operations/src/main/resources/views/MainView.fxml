@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 
-<BorderPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.avaneev.opencv.basic.MainController">
+<BorderPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.avaneev.opencv.basic.MainController">
     <top>
         <JFXToolbar prefHeight="97.0" prefWidth="7264.0">
             <leftItems>
