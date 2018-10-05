@@ -2,77 +2,96 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXSpinner?>
-<?import com.jfoenix.controls.JFXToggleButton?>
 <?import com.jfoenix.controls.JFXToolbar?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.avaneev.opencv.recognition.MainController">
+<BorderPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.avaneev.opencv.recognition.MainController">
     <top>
         <JFXToolbar prefHeight="97.0" prefWidth="7264.0">
             <leftItems>
-                <Label text="OpenCV Shape Recognition" />
+                <Label text="OpenCV Shape Recognition"/>
             </leftItems>
         </JFXToolbar>
     </top>
-   <center>
-      <StackPane styleClass="image-pane" BorderPane.alignment="CENTER">
-         <VBox fx:id="fileDropBox" alignment="CENTER" styleClass="file-drop-zone-box">
-            <padding>
-               <Insets left="16.0" right="16.0" />
-            </padding>
-            <AnchorPane visible="false">
-               <VBox.margin>
-                  <Insets top="-40.0" />
-               </VBox.margin>
-               <Label fx:id="errorLabel" alignment="CENTER" styleClass="error" text="Cannot read file %s! Try another one!" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-               <MaterialDesignIconView fill="WHITE" glyphName="ALERT_OCTAGON" layoutX="14.0" layoutY="26.0" size="24" />
-            </AnchorPane>
-             <AnchorPane onDragDropped="#onFileDropped" onDragOver="#onFileOver">
-                 <VBox styleClass="file-drop-zone" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                     <Label prefHeight="31.0" prefWidth="319.0" text="Drag and drop image here or" />
-                     <JFXButton focusTraversable="false" onAction="#chooseFile" styleClass="primary" text="BROWSE FILES" />
-                 </VBox>
-             </AnchorPane>
-         </VBox>
-         <VBox alignment="CENTER" visible="false">
-            <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
-         </VBox>
-         <VBox fx:id="fileLoadingBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="file-loading-box" visible="false">
-            <JFXSpinner prefHeight="50.0" prefWidth="50.0" />
-            <Label text="Loading image..." />
-         </VBox>
-      </StackPane>
-   </center>
-   <right>
-      <BorderPane fx:id="settingsPane" prefWidth="400.0" styleClass="settings-pane" BorderPane.alignment="CENTER">
-         <bottom>
-            <AnchorPane styleClass="footer" BorderPane.alignment="CENTER">
-               <JFXButton onAction="#onSaveAction" styleClass="primary" text="SAVE" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-               <JFXButton onAction="#reset" text="RESET" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-            </AnchorPane>
-         </bottom>
-         <center>
-             <VBox prefHeight="604.0" prefWidth="332.0" spacing="32.0" BorderPane.alignment="CENTER">
-                 <padding>
-                     <Insets left="16.0" right="16.0" top="16.0" />
-                 </padding>
-               <JFXToggleButton fx:id="showEdgesToggle" text="Show contours" />
-             </VBox>
-         </center>
-         <top>
-            <Label prefWidth="369.0" styleClass="header" text="Detect geometric shapes" BorderPane.alignment="CENTER_LEFT">
-               <padding>
-                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-               </padding>
-            </Label>
-         </top>
-      </BorderPane>
-   </right>
+    <center>
+        <StackPane styleClass="image-pane" BorderPane.alignment="CENTER">
+            <VBox fx:id="fileDropBox" alignment="CENTER" styleClass="file-drop-zone-box">
+                <padding>
+                    <Insets left="16.0" right="16.0"/>
+                </padding>
+                <AnchorPane visible="false">
+                    <VBox.margin>
+                        <Insets top="-40.0"/>
+                    </VBox.margin>
+                    <Label fx:id="errorLabel" alignment="CENTER" styleClass="error"
+                           text="Cannot read file %s! Try another one!" AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0"/>
+                    <MaterialDesignIconView fill="WHITE" glyphName="ALERT_OCTAGON" layoutX="14.0" layoutY="26.0" size="24"/>
+                </AnchorPane>
+                <AnchorPane onDragDropped="#onFileDropped" onDragOver="#onFileOver">
+                    <VBox styleClass="file-drop-zone" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <Label prefHeight="31.0" prefWidth="319.0" text="Drag and drop image here or"/>
+                        <JFXButton focusTraversable="false" onAction="#chooseFile" styleClass="primary"
+                                   text="BROWSE FILES"/>
+                    </VBox>
+                </AnchorPane>
+            </VBox>
+            <VBox alignment="CENTER" visible="false">
+                <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true"/>
+            </VBox>
+            <VBox fx:id="fileLoadingBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0"
+                  styleClass="file-loading-box" visible="false">
+                <JFXSpinner prefHeight="50.0" prefWidth="50.0"/>
+                <Label text="Loading image..."/>
+            </VBox>
+        </StackPane>
+    </center>
+    <right>
+        <BorderPane fx:id="settingsPane" prefWidth="400.0" styleClass="settings-pane" BorderPane.alignment="CENTER">
+            <bottom>
+                <AnchorPane styleClass="footer" BorderPane.alignment="CENTER">
+                    <JFXButton onAction="#onClose" styleClass="primary" text="CLOSE" AnchorPane.bottomAnchor="0.0"
+                               AnchorPane.rightAnchor="0.0"/>
+                    <JFXButton fx:id="cancelButton" onAction="#reset" text="CANCEL" AnchorPane.bottomAnchor="0.0"
+                               AnchorPane.leftAnchor="0.0"/>
+                </AnchorPane>
+            </bottom>
+            <center>
+                <VBox prefHeight="604.0" prefWidth="332.0" spacing="32.0" BorderPane.alignment="CENTER">
+                    <padding>
+                        <Insets left="16.0" right="16.0" top="16.0"/>
+                    </padding>
+                    <VBox spacing="20.0">
+                        <JFXButton fx:id="detectButton" focusTraversable="false" onAction="#startDetection"
+                                   prefHeight="34.0" prefWidth="382.0" styleClass="primary" text="DETECT"/>
+                        <JFXButton fx:id="runDemoButton" focusTraversable="false" layoutX="10.0" layoutY="10.0"
+                                   onAction="#startDetectionDemo" prefHeight="34.0" prefWidth="382.0" text="RUN DEMO"/>
+                    </VBox>
+                    <TextArea fx:id="logArea" editable="false" focusTraversable="false" prefHeight="299.0"
+                              prefWidth="368.0"/>
+                    <VBox>
+                        <JFXButton fx:id="showEdgesButton" focusTraversable="false" prefHeight="34.0" prefWidth="382.0"
+                                   styleClass="primary" text="SHOW CONTOURS" visible="false"/>
+                    </VBox>
+                </VBox>
+            </center>
+            <top>
+                <Label prefWidth="369.0" styleClass="header" text="Detect geometric shapes"
+                       BorderPane.alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+                    </padding>
+                </Label>
+            </top>
+        </BorderPane>
+    </right>
 </BorderPane>

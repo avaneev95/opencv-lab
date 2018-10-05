@@ -3,12 +3,14 @@ package com.avaneev.opencv.recognition.detection;
 import com.avaneev.opencv.recognition.detection.classifiers.Classifier;
 import com.avaneev.opencv.recognition.detection.classifiers.ClassifierFactory;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -19,19 +21,24 @@ import java.util.function.Consumer;
 public class ShapeDetector {
 
     private Mat source;
+    private Mat edges;
+    private Consumer<Shape> onShapeDetected;
+
     @Builder.Default
     private boolean putLabels = true;
     @Builder.Default
     private boolean drawContours = true;
-    private Consumer<Shape> onShapeDetected;
-
+    @Builder.Default
+    private final Stats stats = new Stats();
 
     public void detect() {
+        this.stats.setStartTimestamp(System.nanoTime());
         Mat edges = this.findEdges();
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        this.stats.setFoundContours(contours.size());
         for (int i = 0; i < contours.size(); i++) {
             if (Math.abs(Imgproc.contourArea(contours.get(i))) < 100) {
                 continue;
@@ -52,9 +59,11 @@ public class ShapeDetector {
                     if (onShapeDetected != null) {
                         onShapeDetected.accept(shape);
                     }
+                    this.stats.setRecognisedContours(this.stats.getRecognisedContours() + 1);
                 }
             }
         }
+        this.stats.setEndTimestamp(System.nanoTime());
     }
 
     private void putLabel(List<MatOfPoint> contours, int i, String shapeName) {
@@ -70,7 +79,15 @@ public class ShapeDetector {
     }
 
     public Mat getSource() {
-        return source;
+        return this.source;
+    }
+
+    public Mat getEdges() {
+        return this.edges;
+    }
+
+    public Stats getStats() {
+        return this.stats;
     }
 
     private Mat findEdges() {
@@ -78,6 +95,25 @@ public class ShapeDetector {
         Imgproc.cvtColor(source, edges, Imgproc.COLOR_BGR2GRAY);
         Imgproc.blur(edges, edges, new Size(3, 3));
         Imgproc.Canny(edges, edges, 10, 100, 3);
+        this.edges = edges;
         return edges;
+    }
+
+    @Getter
+    @Setter
+    public static class Stats {
+        private int foundContours = 0;
+        private int recognisedContours;
+        private long startTimestamp;
+        private long endTimestamp;
+
+        public String getTimeString() {
+            long interval = (endTimestamp - startTimestamp) / 1000000;
+            final long hr = TimeUnit.MILLISECONDS.toHours(interval);
+            final long min = TimeUnit.MILLISECONDS.toMinutes(interval) %60;
+            final long sec = TimeUnit.MILLISECONDS.toSeconds(interval) %60;
+            final long ms = TimeUnit.MILLISECONDS.toMillis(interval) %1000;
+            return String.format("%02d:%02d:%02d.%03d", hr, min, sec, ms);
+        }
     }
 }

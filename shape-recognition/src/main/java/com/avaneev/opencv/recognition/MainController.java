@@ -6,7 +6,9 @@ import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -34,7 +36,16 @@ public class MainController {
     public Label errorLabel;
     @FXML
     public VBox fileDropBox;
-    public JFXToggleButton showEdgesToggle;
+    @FXML
+    private JFXButton cancelButton;
+    @FXML
+    private JFXButton detectButton;
+    @FXML
+    private JFXButton runDemoButton;
+    @FXML
+    private TextArea logArea;
+    @FXML
+    private JFXButton showEdgesButton;
     @FXML
     private VBox fileLoadingBox;
     @FXML
@@ -44,14 +55,12 @@ public class MainController {
 
     private FileChooser fileChooser;
     private Mat source;
-    private Mat edges;
+    private boolean showEdges;
 
     @FXML
     private void initialize() {
         this.fileChooser = new FileChooser();
         this.fileChooser.setInitialDirectory(new File("./"));
-
-        Platform.runLater(() -> this.loadImage(new File("./test_data/shapes.png")));
     }
 
     @FXML
@@ -95,32 +104,8 @@ public class MainController {
     }
 
     @FXML
-    private void onSaveAction(ActionEvent event) {
-//        fileChooser.setTitle("Save image");
-//        fileChooser.setInitialFileName(filename);
-//        fileChooser.getExtensionFilters().clear();
-//        fileChooser.getExtensionFilters().addAll(
-//                new FileChooser.ExtensionFilter("PNG Format", "*.png"),
-//                new FileChooser.ExtensionFilter("JPEG Format", "*.jpeg", "*.jpg")
-//        );
-//        File file = fileChooser.showSaveDialog(((JFXButton) event.getSource()).getScene().getWindow());
-//        if (file != null) {
-//            JFXDialog alert = new JFXDialog();
-//            CompletableFuture
-//                    .runAsync(() -> imageProcessor.saveToFile(file))
-//                    .thenRun(alert::close);
-//            alert.setOverlayClose(false);
-//            JFXDialogLayout layout = new JFXDialogLayout();
-//            layout.getStyleClass().add("alert-dialog");
-//            layout.setHeading(new Label("Save image"));
-//            VBox vBox = new VBox(new JFXSpinner(), new Label("Saving " + file.getName() + "..."));
-//            vBox.setAlignment(Pos.CENTER);
-//            vBox.getStyleClass().add("file-loading-box");
-//            vBox.setPadding(new Insets(32, 0, 16, 0));
-//            layout.setBody(vBox);
-//            alert.setContent(layout);
-//            alert.show((StackPane) ((JFXButton) event.getTarget()).getScene().getRoot());
-//        }
+    private void onClose() {
+        Platform.exit();
     }
 
     @FXML
@@ -130,6 +115,11 @@ public class MainController {
         imageView.getParent().setVisible(false);
         imageView.setFitHeight(0);
         imageView.setFitWidth(0);
+        source = null;
+        logArea.setText("");
+        showEdgesButton.setVisible(false);
+        runDemoButton.setDisable(false);
+        detectButton.setDisable(false);
         settingsPane.setDisable(true);
     }
 
@@ -143,30 +133,64 @@ public class MainController {
         fileLoadingBox.setVisible(false);
         imageView.getParent().setVisible(true);
         settingsPane.setDisable(false);
+    }
 
+    @FXML
+    private void startDetection() {
+        this.startDetection(0);
+    }
 
+    @FXML
+    private void startDetectionDemo() {
+        this.startDetection(800);
+    }
+
+    private void startDetection(int timeout) {
         ShapeDetector detector = ShapeDetector.builder()
                 .source(source)
                 .drawContours(true)
                 .putLabels(true)
                 .onShapeDetected(shape -> {
                     String s = shape.name().toLowerCase();
-                    s = s.substring(0, 1).toUpperCase() + s.substring(1);
+                    final String name = s.substring(0, 1).toUpperCase() + s.substring(1);
                     this.repaintImage();
-                    System.out.println("Detected shape: " + s);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    Platform.runLater(() -> logArea.appendText("Detected shape: " + name + "\n"));
+                    if (timeout > 0) {
+                        try {
+                            Thread.sleep(timeout);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 })
                 .build();
 
-        CompletableFuture.runAsync(detector::detect);
+        cancelButton.setDisable(true);
+        detectButton.setDisable(true);
+        runDemoButton.setDisable(true);
+        logArea.appendText("Starting detection...\n");
+        logArea.appendText("Preparing image...\n");
 
-        showEdgesToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            Mat img = newValue ? edges : source;
-            Platform.runLater(() -> repaintImage(img));
+        CompletableFuture
+                .runAsync(detector::detect)
+                .thenRun(() -> {
+                    showEdgesButton.setVisible(true);
+                    cancelButton.setDisable(false);
+                    ShapeDetector.Stats stats = detector.getStats();
+                    logArea.appendText("Detection completed in " + stats.getTimeString() + "\n");
+                    logArea.appendText(String.format("Contours recognised: %d/%d",
+                            stats.getRecognisedContours(), stats.getFoundContours()));
+                });
+
+        showEdgesButton.setOnAction(event -> {
+            showEdges = !showEdges;
+            if (showEdges) {
+                ((Button) event.getSource()).setText("HIDE CONTOURS");
+                repaintImage(detector.getEdges());
+            } else {
+                ((Button) event.getSource()).setText("SHOW CONTOURS");
+                repaintImage();
+            }
         });
 
     }

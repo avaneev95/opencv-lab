@@ -1,7 +1,6 @@
 .root {
     -fx-font-smoothing-type: gray;
     -main-color: #0277bd;
-    /*-accent-color: #7c4dff;*/
     -accent-color: #0277bd;
 
     -error-color: #f44236;
@@ -26,6 +25,55 @@
 .settings-pane .label.header {
     -fx-font-family: "Roboto Medium";
     -fx-font-size: 18px;
+}
+
+.settings-pane TextArea {
+    -fx-background-insets: 0;
+    -fx-background-color: #d7d7d7;
+    -fx-focus-color: -fx-control-inner-background;
+    -fx-faint-focus-color: -fx-control-inner-background;
+    -fx-text-box-border: -fx-control-inner-background;
+
+}
+.settings-pane TextArea:focused {
+    -fx-background-color: #d7d7d7;
+    -fx-background-insets: 0;
+    -fx-focus-color: -fx-control-inner-background;
+    -fx-faint-focus-color: -fx-control-inner-background;
+    -fx-text-box-border: -fx-control-inner-background;
+}
+
+.settings-pane TextArea .scroll-bar:horizontal .track,
+.settings-pane TextArea .scroll-bar:vertical .track {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-border-radius: 2em;
+}
+.settings-pane TextArea .scroll-bar:horizontal .increment-button,
+.settings-pane TextArea .scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-padding: 0 0 10 0;
+
+}
+.settings-pane TextArea .scroll-bar:vertical .increment-button ,
+.settings-pane TextArea .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-padding: 0 10 0 0;
+}
+.settings-pane TextArea .scroll-bar .increment-arrow,
+.settings-pane TextArea .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+.settings-pane TextArea .scroll-bar:horizontal .thumb,
+.settings-pane TextArea .scroll-bar:vertical .thumb {
+    -fx-background-color: derive(black,90%);
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 2em;
+
 }
 
 .jfx-tool-bar {
@@ -150,12 +198,10 @@
 .alert-dialog-error .jfx-layout-actions .jfx-button {
      -fx-text-fill: -error-color;
  }
-
 .alert-dialog .jfx-layout-heading .label {
     -fx-text-fill: -text-color;
     -fx-font-family: "Roboto Medium";
 }
-
 .alert-dialog .jfx-layout-actions .jfx-button {
     -fx-background-color: transparent;
     -fx-text-fill: -text-color;
