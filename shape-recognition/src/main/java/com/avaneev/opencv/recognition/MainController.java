@@ -192,10 +192,10 @@ public class MainController {
         showEdgesButton.setOnAction(event -> {
             showEdges = !showEdges;
             if (showEdges) {
-                ((Button) event.getSource()).setText("HIDE CONTOURS");
+                ((Button) event.getSource()).setText("HIDE EDGES");
                 repaintImage(detector.getEdges());
             } else {
-                ((Button) event.getSource()).setText("SHOW CONTOURS");
+                ((Button) event.getSource()).setText("SHOW EDGES");
                 repaintImage();
             }
         });
