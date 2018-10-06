@@ -23,7 +23,7 @@ public class QuadrangleClassifier implements Classifier {
             double diagonalsAngle = diagonal1.angleBetween(diagonal2);
 
             double minCosThreshold = -0.1;
-            double maxCosThreshold = 0.3;
+            double maxCosThreshold = 0.17;
 
             if (polygon.getMinCos() >= minCosThreshold && polygon.getMaxCos() <= maxCosThreshold) {
                 return diagonalsAngle >= minCosThreshold && diagonalsAngle <= maxCosThreshold ? SQUARE : RECTANGLE;

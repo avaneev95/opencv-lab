@@ -61,6 +61,12 @@ public class MainController {
     private void initialize() {
         this.fileChooser = new FileChooser();
         this.fileChooser.setInitialDirectory(new File("./"));
+
+        Platform.runLater(() -> {
+            Stage stage = ((Stage) imageView.getScene().getWindow());
+            stage.widthProperty().addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
+            stage.heightProperty().addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
+        });
     }
 
     @FXML
@@ -126,9 +132,6 @@ public class MainController {
     private void initScene() {
         this.repaintImage();
         this.resizeImage();
-        Stage stage = ((Stage) imageView.getScene().getWindow());
-        stage.widthProperty().addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
-        stage.heightProperty().addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
 
         fileLoadingBox.setVisible(false);
         imageView.getParent().setVisible(true);
@@ -153,8 +156,10 @@ public class MainController {
                 .onShapeDetected(shape -> {
                     String s = shape.name().toLowerCase();
                     final String name = s.substring(0, 1).toUpperCase() + s.substring(1);
-                    this.repaintImage();
-                    Platform.runLater(() -> logArea.appendText("Detected shape: " + name + "\n"));
+                    Platform.runLater(() -> {
+                        logArea.appendText("Detected shape: " + name + "\n");
+                        this.repaintImage();
+                    });
                     if (timeout > 0) {
                         try {
                             Thread.sleep(timeout);
@@ -174,12 +179,14 @@ public class MainController {
         CompletableFuture
                 .runAsync(detector::detect)
                 .thenRun(() -> {
-                    showEdgesButton.setVisible(true);
-                    cancelButton.setDisable(false);
                     ShapeDetector.Stats stats = detector.getStats();
-                    logArea.appendText("Detection completed in " + stats.getTimeString() + "\n");
-                    logArea.appendText(String.format("Contours recognised: %d/%d",
-                            stats.getRecognisedContours(), stats.getFoundContours()));
+                    Platform.runLater(() -> {
+                        showEdgesButton.setVisible(true);
+                        cancelButton.setDisable(false);
+                        logArea.appendText("Detection completed in " + stats.getTimeString() + "\n");
+                        logArea.appendText(String.format("Contours recognised: %d/%d",
+                                stats.getRecognisedContours(), stats.getFoundContours()));
+                    });
                 });
 
         showEdgesButton.setOnAction(event -> {
@@ -222,6 +229,9 @@ public class MainController {
     }
 
     private void fitImageViewWidth(double stageWidth) {
+        if (imageView.getImage() == null) {
+            return;
+        }
         double w = stageWidth - 416; // Right sidebar width offset
         if (imageView.getImage().getRequestedWidth() > w) {
             imageView.setFitWidth(w);
@@ -231,6 +241,9 @@ public class MainController {
     }
 
     private void fitImageViewHeight(double stageHeight) {
+        if (imageView.getImage() == null) {
+            return;
+        }
         double h = stageHeight - 86; // Toolbar height offset
         if (imageView.getImage().getRequestedHeight() > h) {
             imageView.setFitHeight(h);

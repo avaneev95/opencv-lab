@@ -44,7 +44,7 @@ public class ShapeDetector {
                 continue;
             }
 
-            Polygon polygon = new Polygon(contours.get(i), 0.015);
+            Polygon polygon = new Polygon(contours.get(i), 0.01);
             List<Classifier> classifiers = ClassifierFactory.getClassifiers();
             for (Classifier classifier : classifiers) {
                 Shape shape = classifier.classify(polygon);
@@ -60,6 +60,7 @@ public class ShapeDetector {
                         onShapeDetected.accept(shape);
                     }
                     this.stats.setRecognisedContours(this.stats.getRecognisedContours() + 1);
+                    break;
                 }
             }
         }
@@ -69,13 +70,13 @@ public class ShapeDetector {
     private void putLabel(List<MatOfPoint> contours, int i, String shapeName) {
         Rect boundRect = Imgproc.boundingRect(new MatOfPoint(contours.get(i).toArray()));
         int[] baseLine = new int[1];
-        Size textSize = Imgproc.getTextSize(shapeName, Core.FONT_HERSHEY_SIMPLEX, 0.6, 2, baseLine);
+        Size textSize = Imgproc.getTextSize(shapeName, Core.FONT_HERSHEY_SIMPLEX, 0.8, 2, baseLine);
         int y = boundRect.y + boundRect.height + 20;
         if (boundRect.y + boundRect.height + textSize.height + 20 > source.height()) {
             y = boundRect.y - 10;
         }
         Point position = new Point(boundRect.x + (boundRect.width - textSize.width) / 2, y);
-        Imgproc.putText(source, shapeName, position, Core.FONT_HERSHEY_SIMPLEX, 0.6, new Scalar(0, 0, 0), 2);
+        Imgproc.putText(source, shapeName, position, Core.FONT_HERSHEY_SIMPLEX, 0.8, new Scalar(0, 0, 0), 2);
     }
 
     public Mat getSource() {

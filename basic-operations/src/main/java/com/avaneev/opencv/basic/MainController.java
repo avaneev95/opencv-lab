@@ -52,6 +52,12 @@ public class MainController {
     private void initialize() {
         this.fileChooser = new FileChooser();
         this.fileChooser.setInitialDirectory(new File("./"));
+
+        Platform.runLater(() -> {
+            Stage stage = ((Stage) imageView.getScene().getWindow());
+            stage.widthProperty().addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
+            stage.heightProperty().addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
+        });
     }
 
     @FXML
@@ -161,6 +167,9 @@ public class MainController {
     }
 
     private void initScene() {
+        imageView.setImage(imageProcessor.toImage());
+        this.resizeImage();
+
         angleField.setOnAction(event -> {
             this.setAngleInInput();
             angleField.getParent().requestFocus();
@@ -178,13 +187,6 @@ public class MainController {
             }
         });
 
-        imageView.setImage(imageProcessor.toImage());
-        this.resizeImage();
-
-        Stage stage = ((Stage) imageView.getScene().getWindow());
-        stage.widthProperty().addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
-        stage.heightProperty().addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
-
         fileLoadingBox.setVisible(false);
         imageView.getParent().setVisible(true);
         settingsPane.setDisable(false);
@@ -200,7 +202,7 @@ public class MainController {
         if (angleSlider.getValue() != 0) {
             angleSlider.setValue(0);
         } else {
-            imageView.setImage(imageProcessor.toImage());
+            Platform.runLater(() -> imageView.setImage(imageProcessor.toImage()));
         }
     }
 
@@ -208,7 +210,9 @@ public class MainController {
         fileDropBox.setVisible(false);
         fileLoadingBox.setVisible(true);
         filename = file.getName().substring(0, file.getName().lastIndexOf('.')) + "_modified";
-        CompletableFuture.runAsync(() -> this.readImage(file)).thenRun(this::initScene);
+        CompletableFuture
+                .runAsync(() -> this.readImage(file))
+                .thenRun(() -> Platform.runLater(this::initScene));
     }
 
     private void resizeImage() {
@@ -219,6 +223,9 @@ public class MainController {
 
 
     private void fitImageViewWidth(double stageWidth) {
+        if (imageView.getImage() == null) {
+            return;
+        }
         double w = stageWidth - 416; // Right sidebar width offset
         if (imageView.getImage().getRequestedWidth() > w) {
             imageView.setFitWidth(w);
@@ -228,6 +235,9 @@ public class MainController {
     }
 
     private void fitImageViewHeight(double stageHeight) {
+        if (imageView.getImage() == null) {
+            return;
+        }
         double h = stageHeight - 86; // Toolbar height offset
         if (imageView.getImage().getRequestedHeight() > h) {
             imageView.setFitHeight(h);
