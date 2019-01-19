@@ -25,7 +25,7 @@ public class Vector {
      * @param pStart начальная точка.
      * @param pEnd конечная точка.
      */
-    public static Vector from(Point pStart, Point pEnd) {
+    public static Vector of(Point pStart, Point pEnd) {
         return new Vector(pEnd.x - pStart.x, pEnd.y - pStart.y);
     }
 

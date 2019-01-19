@@ -16,15 +16,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.extern.java.Log;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 /**
  * @author Andrey Vaneev
  * Creation date: 16.09.2018
  */
+@Log
 public class MainController {
 
     @FXML
@@ -48,6 +51,10 @@ public class MainController {
     private FileChooser fileChooser;
     private String filename;
 
+    private static final String JPEG = "*.jpeg";
+    private static final String JPG = "*.jpg";
+    private static final String PNG = "*.png";
+
     @FXML
     private void initialize() {
         this.fileChooser = new FileChooser();
@@ -65,9 +72,9 @@ public class MainController {
         fileChooser.setTitle("Choose image");
         fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Images", "*.jpeg", "*.jpg", "*.png"),
-                new FileChooser.ExtensionFilter("PNG Format", "*.png"),
-                new FileChooser.ExtensionFilter("JPEG Format", "*.jpeg", "*.jpg")
+                new FileChooser.ExtensionFilter("All Images", JPEG, JPG, PNG),
+                new FileChooser.ExtensionFilter("PNG Format", PNG),
+                new FileChooser.ExtensionFilter("JPEG Format", JPEG, JPG)
         );
         File file = fileChooser.showOpenDialog(((JFXButton) event.getSource()).getScene().getWindow());
         if (file != null) {
@@ -130,8 +137,8 @@ public class MainController {
         fileChooser.setInitialFileName(filename);
         fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PNG Format", "*.png"),
-                new FileChooser.ExtensionFilter("JPEG Format", "*.jpeg", "*.jpg")
+                new FileChooser.ExtensionFilter("PNG Format", PNG),
+                new FileChooser.ExtensionFilter("JPEG Format", JPEG, JPG)
         );
         File file = fileChooser.showSaveDialog(((JFXButton) event.getSource()).getScene().getWindow());
         if (file != null) {
@@ -251,7 +258,7 @@ public class MainController {
             this.imageProcessor = ImageProcessor.createProcessor(file);
             this.imageProcessor.toBGRA();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             this.showFileError(String.format("Can't read file \"%s\"! Try another one!", file.getName()));
         }
     }

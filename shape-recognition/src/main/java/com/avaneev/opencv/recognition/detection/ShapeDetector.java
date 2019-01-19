@@ -10,6 +10,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -21,7 +22,7 @@ import java.util.function.Consumer;
 public class ShapeDetector {
 
     private Mat source;
-    private Mat edges;
+    private Mat originalEdges;
     private Consumer<Shape> onShapeDetected;
 
     @Builder.Default
@@ -43,28 +44,34 @@ public class ShapeDetector {
             if (Math.abs(Imgproc.contourArea(contours.get(i))) < 100) {
                 continue;
             }
-
             Polygon polygon = new Polygon(contours.get(i), 0.01);
-            List<Classifier> classifiers = ClassifierFactory.getClassifiers();
-            for (Classifier classifier : classifiers) {
-                Shape shape = classifier.classify(polygon);
-                if (shape != null) {
-                    String shapeName = shape.name().toLowerCase();
-                    if (drawContours) {
-                        Imgproc.drawContours(source, contours, i, new Scalar(0, 0, 255), 2);
-                    }
-                    if (putLabels) {
-                        this.putLabel(contours, i, shapeName);
-                    }
-                    if (onShapeDetected != null) {
-                        onShapeDetected.accept(shape);
-                    }
-                    this.stats.setRecognisedContours(this.stats.getRecognisedContours() + 1);
-                    break;
+            int idx = i;
+            this.getShape(polygon).ifPresent(shape -> {
+                String shapeName = shape.name().toLowerCase();
+                if (drawContours) {
+                    Imgproc.drawContours(source, contours, idx, new Scalar(0, 0, 255), 2);
                 }
-            }
+                if (putLabels) {
+                    this.putLabel(contours, idx, shapeName);
+                }
+                if (onShapeDetected != null) {
+                    onShapeDetected.accept(shape);
+                }
+                this.stats.setRecognisedContours(this.stats.getRecognisedContours() + 1);
+            });
         }
         this.stats.setEndTimestamp(System.nanoTime());
+    }
+
+    private Optional<Shape> getShape(Polygon polygon) {
+        List<Classifier> classifiers = ClassifierFactory.getClassifiers();
+        for (Classifier classifier : classifiers) {
+            Shape shape = classifier.classify(polygon);
+            if (shape != null) {
+                return Optional.of(shape);
+            }
+        }
+        return Optional.empty();
     }
 
     private void putLabel(List<MatOfPoint> contours, int i, String shapeName) {
@@ -84,7 +91,7 @@ public class ShapeDetector {
     }
 
     public Mat getEdges() {
-        return this.edges;
+        return this.originalEdges;
     }
 
     public Stats getStats() {
@@ -96,7 +103,7 @@ public class ShapeDetector {
         Imgproc.cvtColor(source, edges, Imgproc.COLOR_BGR2GRAY);
         Imgproc.blur(edges, edges, new Size(3, 3));
         Imgproc.Canny(edges, edges, 10, 100, 3);
-        this.edges = edges;
+        this.originalEdges = edges;
         return edges;
     }
 
@@ -111,9 +118,9 @@ public class ShapeDetector {
         public String getTimeString() {
             long interval = (endTimestamp - startTimestamp) / 1000000;
             final long hr = TimeUnit.MILLISECONDS.toHours(interval);
-            final long min = TimeUnit.MILLISECONDS.toMinutes(interval) %60;
-            final long sec = TimeUnit.MILLISECONDS.toSeconds(interval) %60;
-            final long ms = TimeUnit.MILLISECONDS.toMillis(interval) %1000;
+            final long min = TimeUnit.MILLISECONDS.toMinutes(interval) % 60;
+            final long sec = TimeUnit.MILLISECONDS.toSeconds(interval) % 60;
+            final long ms = TimeUnit.MILLISECONDS.toMillis(interval) % 1000;
             return String.format("%02d:%02d:%02d.%03d", hr, min, sec, ms);
         }
     }

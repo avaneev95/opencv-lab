@@ -1,9 +1,7 @@
 package com.avaneev.opencv.recognition.detection.classifiers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.avaneev.opencv.recognition.detection.Shape.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Vaneev
@@ -11,39 +9,29 @@ import static com.avaneev.opencv.recognition.detection.Shape.*;
  */
 public class ClassifierFactory {
 
+    private static final Map<Shape, Classifier> CLASSIFIER_CACHE = new EnumMap<>(Shape.class);
+
+    static {
+        CLASSIFIER_CACHE.put(Shape.QUADRANGLE, new QuadrangleClassifier());
+        CLASSIFIER_CACHE.put(Shape.ELLIPSE, new EllipseClassifier());
+        CLASSIFIER_CACHE.put(Shape.TRIANGLE, new TriangleClassifier());
+        CLASSIFIER_CACHE.put(Shape.PENTAGON, new PentagonClassifier());
+        CLASSIFIER_CACHE.put(Shape.HEXAGON, new HexagonClassifier());
+        CLASSIFIER_CACHE.put(Shape.OCTAGON, new OctagonClassifier());
+    }
+
     public static Classifier getClassifierFor(Shape shape) {
-        switch (shape) {
-            case QUADRANGLE:
-                return new QuadrangleClassifier();
-            case ELLIPSE:
-                return new EllipseClassifier();
-            case TRIANGLE:
-                return p -> p.getVertices() == 3 ? TRIANGLE : null;
-            case PENTAGON:
-                return p -> (p.getVertices() == 5 && p.getMinCos() >= -0.36 && p.getMinCos() <= -0.27) ? PENTAGON : null;
-            case HEXAGON:
-                return p -> (p.getVertices() == 6 && p.getMinCos() >= -0.6 && p.getMinCos() <= -0.41) ? HEXAGON : null;
-            case OCTAGON:
-                return p -> (p.getVertices() == 8 && p.getMinCos() >= -0.72 && p.getMinCos() <= -0.66) ? OCTAGON : null;
-            default:
-                return null;
-        }
+        return CLASSIFIER_CACHE.get(shape);
     }
 
     public static List<Classifier> getClassifiersFor(List<Shape> shapes) {
-        List<Classifier> classifiers = new ArrayList<>();
-        for (Shape shape : shapes) {
-            classifiers.add(getClassifierFor(shape));
-        }
-        return classifiers;
+        return shapes.stream()
+                .map(ClassifierFactory::getClassifierFor)
+                .collect(Collectors.toList());
     }
 
     public static List<Classifier> getClassifiers() {
-        List<Classifier> classifiers = new ArrayList<>();
-        for (Shape shape : Shape.values()) {
-            classifiers.add(getClassifierFor(shape));
-        }
-        return classifiers;
+        return getClassifiersFor(Arrays.asList(Shape.values()));
     }
 
     public enum Shape {

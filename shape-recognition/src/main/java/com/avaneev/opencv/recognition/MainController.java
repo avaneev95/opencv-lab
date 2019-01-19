@@ -1,5 +1,6 @@
 package com.avaneev.opencv.recognition;
 
+import com.avaneev.opencv.recognition.detection.Shape;
 import com.avaneev.opencv.recognition.detection.ShapeDetector;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
@@ -17,6 +18,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.SneakyThrows;
+import lombok.extern.java.Log;
 import org.opencv.core.*;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -24,12 +27,14 @@ import org.opencv.imgcodecs.Imgcodecs;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 /**
  * @author Andrey Vaneev
  * Creation date: 16.09.2018
  */
+@Log
 public class MainController {
 
     @FXML
@@ -57,6 +62,10 @@ public class MainController {
     private Mat source;
     private boolean showEdges;
 
+    private static final String JPEG = "*.jpeg";
+    private static final String JPG = "*.jpg";
+    private static final String PNG = "*.png";
+
     @FXML
     private void initialize() {
         this.fileChooser = new FileChooser();
@@ -74,9 +83,9 @@ public class MainController {
         fileChooser.setTitle("Choose image");
         fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Images", "*.jpeg", "*.jpg", "*.png"),
-                new FileChooser.ExtensionFilter("PNG Format", "*.png"),
-                new FileChooser.ExtensionFilter("JPEG Format", "*.jpeg", "*.jpg")
+                new FileChooser.ExtensionFilter("All Images", JPEG, JPG, PNG),
+                new FileChooser.ExtensionFilter("PNG Format", PNG),
+                new FileChooser.ExtensionFilter("JPEG Format", JPEG, JPG)
         );
         File file = fileChooser.showOpenDialog(((JFXButton) event.getSource()).getScene().getWindow());
         if (file != null) {
@@ -153,21 +162,7 @@ public class MainController {
                 .source(source)
                 .drawContours(true)
                 .putLabels(true)
-                .onShapeDetected(shape -> {
-                    String s = shape.name().toLowerCase();
-                    final String name = s.substring(0, 1).toUpperCase() + s.substring(1);
-                    Platform.runLater(() -> {
-                        logArea.appendText("Detected shape: " + name + "\n");
-                        this.repaintImage();
-                    });
-                    if (timeout > 0) {
-                        try {
-                            Thread.sleep(timeout);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                })
+                .onShapeDetected(shape -> onShapeDetected(timeout, shape))
                 .build();
 
         cancelButton.setDisable(true);
@@ -178,16 +173,7 @@ public class MainController {
 
         CompletableFuture
                 .runAsync(detector::detect)
-                .thenRun(() -> {
-                    ShapeDetector.Stats stats = detector.getStats();
-                    Platform.runLater(() -> {
-                        showEdgesButton.setVisible(true);
-                        cancelButton.setDisable(false);
-                        logArea.appendText("Detection completed in " + stats.getTimeString() + "\n");
-                        logArea.appendText(String.format("Contours recognised: %d/%d",
-                                stats.getRecognisedContours(), stats.getFoundContours()));
-                    });
-                });
+                .thenRun(() -> onDetectionCompleted(detector));
 
         showEdgesButton.setOnAction(event -> {
             showEdges = !showEdges;
@@ -200,6 +186,30 @@ public class MainController {
             }
         });
 
+    }
+
+    private void onDetectionCompleted(ShapeDetector detector) {
+        ShapeDetector.Stats stats = detector.getStats();
+        Platform.runLater(() -> {
+            showEdgesButton.setVisible(true);
+            cancelButton.setDisable(false);
+            logArea.appendText("Detection completed in " + stats.getTimeString() + "\n");
+            logArea.appendText(String.format("Contours recognised: %d/%d",
+                    stats.getRecognisedContours(), stats.getFoundContours()));
+        });
+    }
+
+    @SneakyThrows
+    private void onShapeDetected(int timeout, Shape shape) {
+        String s = shape.name().toLowerCase();
+        final String name = s.substring(0, 1).toUpperCase() + s.substring(1);
+        Platform.runLater(() -> {
+            logArea.appendText("Detected shape: " + name + "\n");
+            this.repaintImage();
+        });
+        if (timeout > 0) {
+            Thread.sleep(timeout);
+        }
     }
 
     private void repaintImage() {
@@ -217,7 +227,7 @@ public class MainController {
                 .runAsync(() -> this.readImage(file))
                 .thenRun(() -> Platform.runLater(this::initScene))
                 .exceptionally(t -> {
-                    t.printStackTrace();
+                    log.log(Level.SEVERE, t.getMessage(), t);
                     return null;
                 });
     }
@@ -256,7 +266,7 @@ public class MainController {
         try {
             source = Imgcodecs.imread(file.getAbsolutePath());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
             this.showFileError(String.format("Can't read file \"%s\"! Try another one!", file.getName()));
         }
     }

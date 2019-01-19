@@ -15,6 +15,7 @@ public class EllipseClassifier implements Classifier {
 
     @Override
     public Shape classify(Polygon polygon) {
+
         if (polygon.getVertices() > 8) {
             double area = Imgproc.contourArea(polygon.getContour());
             double aspectRatio = ((double) polygon.getWidth()) / polygon.getHeight();

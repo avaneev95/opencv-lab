@@ -46,8 +46,8 @@ public class Polygon {
 
         LinkedList<Double> cos = new LinkedList<>();
         for (int j = 2; j < vertices + 1; j++) {
-            Vector v1 = Vector.from(points[j % vertices], points[j - 1]);
-            Vector v2 = Vector.from(points[j - 2], points[j - 1]);
+            Vector v1 = Vector.of(points[j % vertices], points[j - 1]);
+            Vector v2 = Vector.of(points[j - 2], points[j - 1]);
             cos.add(v1.angleBetween(v2));
         }
         cos.sort(Double::compareTo);

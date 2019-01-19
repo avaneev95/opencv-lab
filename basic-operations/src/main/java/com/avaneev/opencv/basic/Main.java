@@ -7,15 +7,18 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import lombok.extern.java.Log;
 import org.opencv.core.Core;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
 
 /**
  * @author Andrey Vaneev
  * Creation date: 15.09.2018
  */
+@Log
 public class Main extends Application {
 
     static {
@@ -47,7 +50,7 @@ public class Main extends Application {
             primaryStage.setScene(scene);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
 
         primaryStage.show();

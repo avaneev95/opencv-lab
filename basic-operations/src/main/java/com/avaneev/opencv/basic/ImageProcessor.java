@@ -83,7 +83,9 @@ public class ImageProcessor {
             throw new IllegalArgumentException("4 channels images not supported!");
         }
         BufferedImage image;
-        int width = source.width(), height = source.height(), channels = source.channels();
+        int width = source.width();
+        int height = source.height();
+        int channels = source.channels();
         byte[] sourcePixels = new byte[width * height * channels];
         source.get(0, 0, sourcePixels);
 
@@ -106,7 +108,9 @@ public class ImageProcessor {
         if (source.channels() == 1) {
             return SwingFXUtils.toFXImage(this.toBufferedImage(), null);
         }
-        int width = source.width(), height = source.height(), channels = source.channels();
+        int width = source.width();
+        int height = source.height();
+        int channels = source.channels();
         byte[] sourcePixels = new byte[width * height * channels];
         source.get(0, 0, sourcePixels);
         WritableImage value = new WritableImage(width, height);
@@ -116,7 +120,7 @@ public class ImageProcessor {
     }
 
     public void saveToFile(File file) {
-        String ext = file.getName().substring(file.getName().lastIndexOf("."));
+        String ext = file.getName().substring(file.getName().lastIndexOf('.'));
         MatOfInt params = new MatOfInt();
         if (ext.equalsIgnoreCase(".png")) {
             params.fromArray(Imgcodecs.IMWRITE_PNG_COMPRESSION, 9);
