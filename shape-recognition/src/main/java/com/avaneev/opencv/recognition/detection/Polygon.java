@@ -8,10 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <p>Вспомогательный класс для хранения характеристик полигона.</p>
- * <p>Декорирует {@link MatOfPoint} - контур полученный с помощью {@link Imgproc#findContours(Mat, List, Mat, int, int)}.</p>
- * <p>Аппроксимирует контур, рассчитывает количество углов, ширину и высоту полигона,
- * минимальное и максимальное значение косинуса угла между сторонами.</p>
+ * This class represents a polygon.
+ * Decorates {@link MatOfPoint} contour obtained from {@link Imgproc#findContours(Mat, List, Mat, int, int)}.
+ * This class can approximate the contour,
+ * calculate the width, height and number of angles of the polygon,
+ * calculate minimum and maximum cosine of the angle between the sides.
  *
  * @author Andrey Vaneev
  * Creation date: 29.09.2018
@@ -27,10 +28,10 @@ public class Polygon {
     private MatOfPoint contour;
 
     /**
-     * Создает полигон, используя заданный контур и коэффициент точности аппроксимации
+     * Creates a polygon using the specified contour and an approximation accuracy factor.
      *
-     * @param contour исходный контур
-     * @param epsilon коэффицент точноти аппроксимации контура
+     * @param contour source contour.
+     * @param epsilon approximation accuracy factor.
      */
     public Polygon(MatOfPoint contour, double epsilon) {
         MatOfPoint2f approxCurve = new MatOfPoint2f();

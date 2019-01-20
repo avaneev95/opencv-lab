@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 /**
+ * The controller of the main application view.
+ *
  * @author Andrey Vaneev
  * Creation date: 16.09.2018
  */

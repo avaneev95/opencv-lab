@@ -24,6 +24,8 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 /**
+ * The controller of the main application view.
+ *
  * @author Andrey Vaneev
  * Creation date: 16.09.2018
  */
@@ -62,8 +64,10 @@ public class MainController {
 
         Platform.runLater(() -> {
             Stage stage = ((Stage) imageView.getScene().getWindow());
-            stage.widthProperty().addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
-            stage.heightProperty().addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
+            stage.widthProperty()
+                    .addListener((o, oldValue, newValue) -> fitImageViewWidth(newValue.doubleValue()));
+            stage.heightProperty()
+                    .addListener((o, oldValue, newValue) -> fitImageViewHeight(newValue.doubleValue()));
         });
     }
 

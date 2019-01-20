@@ -15,6 +15,9 @@ import java.net.URL;
 import java.util.logging.Level;
 
 /**
+ * The main application class.
+ * It loads OpenCV native lib, loads main view and creates a primary stage of the app.
+ *
  * @author Andrey Vaneev
  * Creation date: 15.09.2018
  */
@@ -22,6 +25,7 @@ import java.util.logging.Level;
 public class Main extends Application {
 
     static {
+        // Load OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         System.setProperty("prism.lcdtext", "false");
     }

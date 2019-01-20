@@ -4,37 +4,54 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * Factory to get the instances of the geometric shape classifiers.
+ *
  * @author Andrey Vaneev
  * Creation date: 29.09.2018
  */
 public class ClassifierFactory {
 
-    private static final Map<Shape, Classifier> CLASSIFIER_CACHE = new EnumMap<>(Shape.class);
+    private static final Map<ShapeType, Classifier> CLASSIFIER_CACHE = new EnumMap<>(ShapeType.class);
 
     static {
-        CLASSIFIER_CACHE.put(Shape.QUADRANGLE, new QuadrangleClassifier());
-        CLASSIFIER_CACHE.put(Shape.ELLIPSE, new EllipseClassifier());
-        CLASSIFIER_CACHE.put(Shape.TRIANGLE, new TriangleClassifier());
-        CLASSIFIER_CACHE.put(Shape.PENTAGON, new PentagonClassifier());
-        CLASSIFIER_CACHE.put(Shape.HEXAGON, new HexagonClassifier());
-        CLASSIFIER_CACHE.put(Shape.OCTAGON, new OctagonClassifier());
+        CLASSIFIER_CACHE.put(ShapeType.QUADRANGLE, new QuadrangleClassifier());
+        CLASSIFIER_CACHE.put(ShapeType.ELLIPSE, new EllipseClassifier());
+        CLASSIFIER_CACHE.put(ShapeType.TRIANGLE, new TriangleClassifier());
+        CLASSIFIER_CACHE.put(ShapeType.PENTAGON, new PentagonClassifier());
+        CLASSIFIER_CACHE.put(ShapeType.HEXAGON, new HexagonClassifier());
+        CLASSIFIER_CACHE.put(ShapeType.OCTAGON, new OctagonClassifier());
     }
 
-    public static Classifier getClassifierFor(Shape shape) {
+    /**
+     * Returns classifier capable to recognise shape of the given shape type.
+     *
+     * @param shape geometric shape type.
+     * @see ShapeType
+     */
+    public static Classifier getClassifierFor(ShapeType shape) {
         return CLASSIFIER_CACHE.get(shape);
     }
 
-    public static List<Classifier> getClassifiersFor(List<Shape> shapes) {
+    /**
+     * Returns a list of classifiers for the given shape types.
+     *
+     * @param shapes geometric shape types.
+     * @see ShapeType
+     */
+    public static List<Classifier> getClassifiersFor(List<ShapeType> shapes) {
         return shapes.stream()
                 .map(ClassifierFactory::getClassifierFor)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns all available classifier.
+     */
     public static List<Classifier> getClassifiers() {
-        return getClassifiersFor(Arrays.asList(Shape.values()));
+        return getClassifiersFor(Arrays.asList(ShapeType.values()));
     }
 
-    public enum Shape {
+    public enum ShapeType {
         TRIANGLE,
         PENTAGON,
         HEXAGON,

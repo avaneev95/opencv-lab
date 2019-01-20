@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.opencv.core.Point;
 
 /**
- * Вспомогательный класс для работы с векторами.
+ * This class represents two point vector.
  *
  * @author Andrey Vaneev
  * Creation date: 29.09.2018
@@ -21,16 +21,17 @@ public class Vector {
     }
 
     /**
-     * Создает вектор по координатам двух точек.
-     * @param pStart начальная точка.
-     * @param pEnd конечная точка.
+     * Creates vector instance from two points coordinates.
+     *
+     * @param pStart start point.
+     * @param pEnd end point.
      */
     public static Vector of(Point pStart, Point pEnd) {
         return new Vector(pEnd.x - pStart.x, pEnd.y - pStart.y);
     }
 
     /**
-     * Возвращает косинус угла между двумя векторами.
+     * Returns the cosine of the angle between two vectors.
      */
     public double angleBetween(Vector other) {
         return (this.x * other.x + this.y * other.y) /
