@@ -57,7 +57,7 @@ public class ImageProcessor {
     }
 
     /**
-     * Rotates image at an given angle.
+     * Rotates image by a given angle.
      *
      * @param angle angle to rotate.
      */
@@ -101,7 +101,7 @@ public class ImageProcessor {
     }
 
     /**
-     * Rotates image at an given angle and immediately return result.
+     * Rotates image by a given angle and immediately return result.
      * Note: this method doesn't mutate original source image.
      *
      * @param angle angle to rotate.
@@ -113,6 +113,13 @@ public class ImageProcessor {
         return dest;
     }
 
+    /**
+     * Rotates image matrix by a given angle.
+     *
+     * @param src source image matrix.
+     * @param dest ratated image matrix.
+     * @param angle angle to rotate.
+     */
     private void rotate(Mat src, Mat dest, int angle) {
         // Create center of rotation - the center of the image
         Point center = new Point(src.cols() / 2.0, src.rows() / 2.0);
